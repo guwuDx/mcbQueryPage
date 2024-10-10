@@ -1,0 +1,20 @@
+.hover-red {
+  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
+}
+
+.hover-red:hover {
+  background-color: #e81123;
+  color: #000000;
+}
+
+.hover-cyan {
+  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
+}
+
+.hover-cyan:hover {
+  background-color: #008484;
+  color: #008484;
+}
+

@@ -1,0 +1,30 @@
+.custom-checkbox {
+  display: inline-block;
+  width: 15%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s;
+}
+
+.unInvert {
+  background-color: #effffe !important;
+  color: black !important;
+}
+
+.Invert {
+  background-color: #00aeee !important;
+  color: white !important;
+}
+
+.custom-checkbox span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-weight: bold;
+}
+
