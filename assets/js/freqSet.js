@@ -32,9 +32,9 @@ let freqSet = new Vue({
             'Disper'
         ],
         symsArr: [
+            '=',
             '≥',
-            '≤',
-            '='
+            '≤'
         ],
         freqGroup: [],
     },
@@ -54,7 +54,7 @@ let freqSet = new Vue({
             this.freqGroup.push({
                 logic: 1,
                 parameter: 2,
-                rangeMode: 3,
+                rangeMode: 1,
                 showRange: true,
                 rangeStart: null,
                 rangeEnd: null,

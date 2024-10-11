@@ -16,9 +16,9 @@ let genericSet = new Vue({
             'h1'
         ],
         symsArr: [
+            '=',
             '≥',
-            '≤',
-            '='
+            '≤'
         ],
         genericGroup: [],
     },
@@ -38,7 +38,7 @@ let genericSet = new Vue({
             this.genericGroup.push({
                 logic: 1,
                 parameter: 3,
-                rangeMode: 3,
+                rangeMode: 1,
                 showRange: true,
                 rangeStart: null,
                 rangeEnd: null,
