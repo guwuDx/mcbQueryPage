@@ -121,14 +121,14 @@
                                         <option value="2">基底材料</option>
                                         <option value="3">单元结构周期(p)</option>
                                         <option value="4">单元结构高度(h)</option>
-                                        <option value="5">基底厚度（h1)</option>
+                                        <option value="5">基底厚度(h1)</option>
                                     </optgroup>
                                 </select>
                                 <div class="input-group-text" :class="['custom-checkbox', conditions.isInvert ? 'Invert' : 'unInvert']" v-on:click="toggleInvert(index)" style="width: 10%;padding: 4px 0;"><span>{{ conditions.isInvert ? '反相' : '同相' }}</span></div><select class="form-select" style="width: 27%;" v-model.number="conditions.rangeMode" v-if="conditions.showRange" v-on:change="updateDisp(index)">
                                     <optgroup label="范围模式">
-                                        <option value="1">≥</option>
-                                        <option value="2">≤</option>
-                                        <option value="3">＝</option>
+                                        <option value="1">=</option>
+                                        <option value="2">≥</option>
+                                        <option value="3">≤</option>
                                         <option value="4">BETWEEN</option>
                                     </optgroup>
                                 </select><button class="btn btn-primary hover-red" id="rmGeneric" type="button" style="font-size: 16px;" v-on:click="rmGeneric(index)"><strong>×</strong></button><!-- Start: new line -->
@@ -185,9 +185,9 @@
                                 </select>
                                 <div class="input-group-text" :class="['custom-checkbox', conditions.isInvert ? 'Invert' : 'unInvert']" v-on:click="toggleInvert(index)" style="width: 10%;padding: 4px 0;"><span>{{ conditions.isInvert ? '反相' : '同相' }}</span></div><select class="form-select" style="width: 27%;" v-model.number="conditions.rangeMode" v-if="conditions.showRange" v-on:change="updateDisp(index)">
                                     <optgroup label="范围模式">
-                                        <option value="1">≥</option>
-                                        <option value="2">≤</option>
-                                        <option value="3">＝</option>
+                                        <option value="1">=</option>
+                                        <option value="2">≥</option>
+                                        <option value="3">≤</option>
                                         <option value="4">BETWEEN</option>
                                     </optgroup>
                                 </select><button class="btn btn-primary hover-red" id="rmGeneric-1" type="button" style="font-size: 16px;" v-on:click="rmFreq(index)"><strong>×</strong></button><!-- Start: new line -->
