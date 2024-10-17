@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="en" data-bss-forced-theme="light">
+<html data-bs-theme="light" lang="cn" data-bss-forced-theme="light">
 
 <head>
     <meta charset="utf-8">
@@ -53,12 +53,13 @@
                                 <option value="2">um</option>
                                 <option value="3">mm</option>
                             </optgroup>
-                        </select></div>
+                        </select>
+                    </div>
                 </div><!-- End: geometric unit select -->
                 <!-- Start: use Radian/Angle system -->
                 <div class="row" style="padding: 6px 2px;">
                     <div class="col d-lg-flex justify-content-lg-end" style="text-align: left;">
-                        <div class="form-check" v-on:click="toggleRadians"><input class="form-check-input" type="checkbox" id="formCheck-1" style="border-width: 1px;border-color: var(--bs-emphasis-color);"><label class="form-check-label" for="formCheck-1">相位使用弧度制（默认单位π）</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1" v-model="global.useRadians" style="border-width: 1px;border-color: var(--bs-emphasis-color);"><label class="form-check-label" for="formCheck-1">相位使用弧度制（默认单位π）</label></div>
                     </div>
                 </div><!-- End: use Radian/Angle system -->
             </div><!-- End: global unit select -->
@@ -80,15 +81,17 @@
                     </div><!-- End: sub viewer -->
                 </div><!-- End: sub viewer --><span class="d-xxl-flex align-items-xxl-center" style="font-size: 19px;display: inline-block;padding-top: 0px;margin-top: 0px;margin-bottom: 0px;"><strong>添加需要检索的形状:&nbsp;</strong><button class="btn btn-primary d-inline-block hover-cyan" id="addShapeBtn" type="button" style="height: auto;margin: 0px 0px 0px 5px;padding: 1px 8px;font-size: 10px;color: green;background: var(--vs-search-input-bg);border-width: 2px;border-color: green;" v-on:click="addAllShape"><strong>添加全部</strong></button></span><!-- Start: add shape -->
                 <div class="row" style="display: flex;padding-left: 0px;width: 100%;margin: 10px -12px;">
-                    <div class="col d-xl-flex align-items-xxl-center" style="border-radius: 6px;margin: 0px 0px 0px 12px;margin-left: 12px;margin-top: 0px;padding-top: 1px;padding-bottom: 1px;padding-right: 1px;padding-left: 2px;border: 1.6px solid var(--bs-blue);margin-right: 0px;width: 90%;height: auto;"><v-select 
-    v-model="selectedShape"
-    :options="shapeOptions" 
-    placeholder="请选择形状"
-    label = "name"
-    style="
-        width: 62%;
-        font-size: 16px;"
-></v-select><button class="btn btn-primary link-primary text-bg-light hover-cyan" id="addShapeBtn-1" type="button" style="height: auto;margin: 0px 0px 0px 5px;padding: 1px 8px;width: 35%;border-width: 2px;" v-on:click="addShape"><strong>确认添加</strong></button></div>
+                    <div class="col d-xl-flex align-items-xxl-center" style="border-radius: 6px;margin: 0px 0px 0px 12px;margin-left: 12px;margin-top: 0px;padding-top: 1px;padding-bottom: 1px;padding-right: 1px;padding-left: 2px;border: 1.6px solid var(--bs-blue);margin-right: 0px;width: 90%;height: auto;">
+                        <v-select 
+                            v-model="selectedShape"
+                            :options="shapeOptions" 
+                            placeholder="请选择形状"
+                            label = "name"
+                            style="
+                                width: 62%;
+                                font-size: 16px;">
+                        </v-select>
+                        <button class="btn btn-primary link-primary text-bg-light hover-cyan" id="addShapeBtn-1" type="button" style="height: auto;margin: 0px 0px 0px 5px;padding: 1px 8px;width: 35%;border-width: 2px;" v-on:click="addShape"><strong>确认添加</strong></button></div>
                 </div><!-- End: add shape -->
                 <!-- Start: tips banner -->
                 <div style="margin-top: 25px;">
@@ -220,20 +223,22 @@
             </div><!-- End: freq response select -->
         </div><!-- End: main section -->
         <!-- Start: options -->
-        <div class="row" id="options">
-            <div class="col">
+        <div class="row" id="options">                <!-- Start: reset confirm -->
+            <div>
+                <!-- Start: interaction blocker -->
+                <div class="modal-overlay" v-if="showConfirm" v-on:click="cancelReset"></div><!-- End: interaction blocker -->
                 <!-- Start: reset confirm -->
-                <div>
-                    <!-- Start: interaction blocker -->
-                    <div class="modal-overlay" v-if="showConfirm" v-on:click="cancelReset"></div><!-- End: interaction blocker -->
-                    <!-- Start: reset confirm -->
-                    <div class="reset-confirm" v-if="showConfirm">
-                        <!-- Start: reset confirm header -->
-                        <div class="d-xxl-flex justify-content-xxl-end"><button class="btn btn-primary" type="button" v-on:click="cancelReset" style="font-size: 20px;">×</button></div><!-- End: reset confirm header -->
-                        <!-- Start: tips span --><span class="tips-span" style="font-size: 20px;width: 100%;position: absolute;"><strong>真的要<span style="color: rgb(255, 15, 0);">重置</span>当前页面的所有内容吗？</strong></span><!-- End: tips span -->
-                        <div class="reset-confirm-buttons" style="text-align: right;position: absolute;padding: 10px;"><button class="btn btn-primary" type="button" v-on:click="cancelReset">取消</button><button class="btn btn-secondary hover-red" type="button" style="margin: 0px 15px;" v-on:click="resetAll">确认重置</button></div>
-                    </div><!-- End: reset confirm -->
+                <div class="reset-confirm" v-if="showConfirm">
+                    <button class="btn btn-primary close-sub" type="button" v-on:click="cancelReset" style="font-size: 20px;">×</button>
+                    <!-- Start: tips span -->
+                    <span class="tips-span" style="font-size: 20px;width: 100%;position: absolute;"><strong>真的要<span style="color: rgb(255, 15, 0);">重置</span>当前页面的所有内容吗？</strong></span><!-- End: tips span -->
+                    <div class="reset-confirm-buttons" style="text-align: right;position: absolute;padding: 10px;">
+                        <button class="btn btn-primary" type="button" v-on:click="cancelReset">取消</button>
+                        <button class="btn btn-secondary hover-red" type="button" style="margin: 0px 15px;" v-on:click="resetAll">确认重置</button>
+                    </div>
                 </div><!-- End: reset confirm -->
+            </div><!-- End: reset confirm -->
+            <div class="col">
                 <div style="width: 100%;padding: 0px 45px;margin: 15px 0px;display: block;">
                     <!-- Start: tools download page -->
                     <div class="d-xxl-flex justify-content-xxl-end" style="width: 100%;"><a href="#">👉 下载函数以将结果导入到其他分析工具</a></div><!-- End: tools download page -->
@@ -243,15 +248,21 @@
                         <div class="d-xxl-flex justify-content-xxl-end" style="margin: 10px 0px;width: 100%;"><input type="file" id="fileInput" style="display: none;" accept=".json" v-on:change="handlePresetFile"><button class="btn btn-primary text-center" type="file" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" accept=".json" v-on:click="triggerFileInput"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-upload">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"></path>
                                     <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"></path>
-                                </svg>&nbsp; 上载预设配置</button><button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;margin-left: 55px;width: 200px;" v-on:click="confirmReset">重置所有</button></div><!-- End: row1 -->
+                                </svg>&nbsp; 上载预设配置</button><button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;margin-left: 55px;width: 200px;" v-on:click="confirmReset">重置所有</button>
+                        </div><!-- End: row1 -->
                         <!-- Start: row2 -->
-                        <div class="d-xxl-flex justify-content-xxl-end" style="margin: 10px 0px;width: 100%;"><button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" v-on:click="saveCurrent"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-download">
+                        <div class="d-xxl-flex justify-content-xxl-end" style="margin: 10px 0px;width: 100%;">
+                            <button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" v-on:click="saveCurrent">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-download">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"></path>
                                     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"></path>
-                                </svg>&nbsp; 保存当前配置</button><button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-border-color);color: var(--bs-btn-disabled-color);font-weight: bold;margin-left: 55px;width: 200px;border-width: 2px;border-color: var(--bs-body-color);"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-database-fill-down">
+                                </svg>&nbsp; 保存当前配置
+                            </button>
+                            <button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-border-color);color: var(--bs-btn-disabled-color);font-weight: bold;margin-left: 55px;width: 200px;border-width: 2px;border-color: var(--bs-body-color);" v-on:click="querySubmit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-database-fill-down">
                                     <path d="M12.5 9a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7m.354 5.854 1.5-1.5a.5.5 0 0 0-.708-.708l-.646.647V10.5a.5.5 0 0 0-1 0v2.793l-.646-.647a.5.5 0 0 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0ZM8 1c-1.573 0-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4s.875 1.755 1.904 2.223C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777C13.125 5.755 14 5.007 14 4s-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1"></path>
                                     <path d="M2 7v-.839c.457.432 1.004.751 1.49.972C4.722 7.693 6.318 8 8 8s3.278-.307 4.51-.867c.486-.22 1.033-.54 1.49-.972V7c0 .424-.155.802-.411 1.133a4.51 4.51 0 0 0-4.815 1.843A12.31 12.31 0 0 1 8 10c-1.573 0-3.022-.289-4.096-.777C2.875 8.755 2 8.007 2 7m6.257 3.998L8 11c-1.682 0-3.278-.307-4.51-.867-.486-.22-1.033-.54-1.49-.972V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13h.027a4.552 4.552 0 0 1 .23-2.002m-.002 3L8 14c-1.682 0-3.278-.307-4.51-.867-.486-.22-1.033-.54-1.49-.972V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.507 4.507 0 0 1-1.3-1.905"></path>
-                                </svg>&nbsp; 提交并下载检索结果</button></div><!-- End: row2 -->
+                            </svg>&nbsp; 提交并下载检索结果</button></div><!-- End: row2 -->
                     </div><!-- End: buttons -->
                     <div class="d-xxl-flex justify-content-xxl-center align-items-xxl-center" style="height: 50px;width: 50px;position: fixed;transform: perspective(0px);right: 0px;top: 61.8%;background: var(--bs-blue);border-radius: 50%;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-baseline-density-medium fs-5 text-light">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -264,8 +275,9 @@
         </div><!-- End: options -->
     </div><!-- End: 2 Rows 1+2 Columns -->
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://unpkg.com/vue-select@latest"></script>
-    <script src="https://unpkg.com/vue@2"></script>
+    <script src="assets/js/vue.min.js"></script>
+    <script src="assets/js/vue-select.min.js"></script>
+    <script src="assets/js/axios.min.js"></script>
     <script src="assets/js/options.js"></script>
     <script src="assets/js/shapeSearchSet.js"></script>
     <script src="assets/js/freqSet.js"></script>

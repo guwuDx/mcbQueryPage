@@ -102,5 +102,10 @@ let freqSet = new Vue({
         EventBus.$on('pre-freqSet', (freqSet) => {
             this.freqGroup = freqSet;
         });
-    }
+    },
+
+    beforeDestroy() {
+        EventBus.$off('resetTrigger');
+        EventBus.$off('pre-freqSet');
+    },
 });

@@ -81,7 +81,46 @@ new Vue({
             } else {
                 alert('请选择一个有效的 JSON 文件');
             }
-        }
+        },
+
+        querySubmit() {
+            // 创建深拷贝的请求对象
+            const queryRequest = {
+                shapeSet: JSON.parse(JSON.stringify(this.summary.shapeSet)),
+                genericSet: JSON.parse(JSON.stringify(this.summary.genericSet)),
+                freqSet: JSON.parse(JSON.stringify(this.summary.freqSet))
+            };
+
+            // 根据 this.summary.global 的值换算单位
+            for (let i = 0; i < this.summary.genericSet.length; i++) {
+                if (3 <= this.summary.genericSet[i].parameter && this.summary.genericSet[i].parameter <= 5) {
+                    queryRequest.genericSet[i].value      *= 1e3 ** (this.summary.global.geometricUnit - 1);
+                    queryRequest.genericSet[i].rangeEnd   *= 1e3 ** (this.summary.global.geometricUnit - 1);
+                    queryRequest.genericSet[i].rangeStart *= 1e3 ** (this.summary.global.geometricUnit - 1);
+                }
+            }
+
+            for (let i = 0; i < this.summary.freqSet.length; i++) {
+                if (this.summary.freqSet[i].parameter === 3 && this.summary.global.freqUnit <= 4) {
+                    queryRequest.freqSet[i].value      *= 1e3 ** (2 - this.summary.global.freqUnit);
+                    queryRequest.freqSet[i].rangeEnd   *= 1e3 ** (2 - this.summary.global.freqUnit);
+                    queryRequest.freqSet[i].rangeStart *= 1e3 ** (2 - this.summary.global.freqUnit);
+                } else if (this.summary.freqSet[i].parameter === 3 && this.summary.global.freqUnit > 4) {
+                    // trans wavelength to THz frequency
+                } else if (this.summary.freqSet[i].parameter === 5 && this.summary.global.useRadians) {
+                    // trans radian to degree
+                    queryRequest.freqSet[i].value      *= 180;
+                    queryRequest.freqSet[i].rangeEnd   *= 180;
+                    queryRequest.freqSet[i].rangeStart *= 180;
+                }
+            }
+            console.log(queryRequest);
+
+            // 发送请求
+            this.sendRequest(queryRequest);
+        },
+
+        sendRequest(queryRequest) {}
     },
     mounted() {
         EventBus.$on('shapeSet', (shapesID) => {
@@ -103,5 +142,12 @@ new Vue({
             this.summary.global = globalSet;
             // console.log(this.globalSet);
         });
+    },
+
+    beforeDestroy() {
+        EventBus.$off('shapeSet');
+        EventBus.$off('genericSet');
+        EventBus.$off('freqSet');
+        EventBus.$off('globalSet');
     },
 })

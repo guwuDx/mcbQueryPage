@@ -86,5 +86,10 @@ let genericSet = new Vue({
         EventBus.$on('pre-genericSet', (genericSet) => {
             this.genericGroup = genericSet;
         });
-    }
+    },
+
+    beforeDestroy() {
+        EventBus.$off('resetTrigger');
+        EventBus.$off('pre-genericSet');
+    },
 });

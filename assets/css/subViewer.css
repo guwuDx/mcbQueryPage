@@ -74,3 +74,9 @@
   right: 0;
 }
 
+.close-sub {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  cursor: pointer;
+}
