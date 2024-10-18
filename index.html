@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/css/hovers.css">
     <link rel="stylesheet" href="assets/css/misc.css">
     <link rel="stylesheet" href="assets/css/subViewer.css">
+    <link rel="stylesheet" href="assets/css/sk-cube.css">
 </head>
 
 <body class="justify-content-end">
@@ -171,7 +172,8 @@
                     <hr style="margin: 0px 0px 23px 0px;background: var(--bs-emphasis-color);opacity: 1;border-width: 3px;">
                     <ul class="list-unstyled">
                         <li v-for="(conditions, index) in freqGroup" :key="index">
-                            <div class="input-group" style="padding-top: 0px;display: flex;width: 100%;margin-top: 0px;margin-bottom: 20px;"><select class="form-select" style="width: 18%;border-radius: 10px 0px 0px 0px;padding: 6px 36px 6px 9px;" v-model.number="conditions.logic" :class="{'strikethrough': index === 0}" v-on:change="updateFreq">
+                            <div class="input-group" style="padding-top: 0px;display: flex;width: 100%;margin-top: 0px;margin-bottom: 20px;">
+                                <select class="form-select" style="width: 18%;border-radius: 10px 0px 0px 0px;padding: 6px 36px 6px 9px;" v-model.number="conditions.logic" :class="{'strikethrough': index === 0}" v-on:change="updateFreq">
                                     <optgroup label="选择逻辑">
                                         <option value="1">AND</option>
                                         <option value="2">OR</option>
@@ -186,14 +188,18 @@
                                         <option value="6">色散(Dispersion)</option>
                                     </optgroup>
                                 </select>
-                                <div class="input-group-text" :class="['custom-checkbox', conditions.isInvert ? 'Invert' : 'unInvert']" v-on:click="toggleInvert(index)" style="width: 10%;padding: 4px 0;"><span>{{ conditions.isInvert ? '反相' : '同相' }}</span></div><select class="form-select" style="width: 27%;" v-model.number="conditions.rangeMode" v-if="conditions.showRange" v-on:change="updateDisp(index)">
+                                <div class="input-group-text" :class="['custom-checkbox', conditions.isInvert ? 'Invert' : 'unInvert']" v-on:click="toggleInvert(index)" style="width: 10%;padding: 4px 0;">
+                                    <span>{{ conditions.isInvert ? '反相' : '同相' }}</span>
+                                </div>
+                                <select class="form-select" style="width: 27%;" v-model.number="conditions.rangeMode" v-if="conditions.showRange" v-on:change="updateDisp(index)">
                                     <optgroup label="范围模式">
                                         <option value="1">=</option>
                                         <option value="2">≥</option>
                                         <option value="3">≤</option>
                                         <option value="4">BETWEEN</option>
                                     </optgroup>
-                                </select><button class="btn btn-primary hover-red" id="rmGeneric-1" type="button" style="font-size: 16px;" v-on:click="rmFreq(index)"><strong>×</strong></button><!-- Start: new line -->
+                                </select>
+                                <button class="btn btn-primary hover-red" id="rmGeneric-1" type="button" style="font-size: 16px;" v-on:click="rmFreq(index)"><strong>×</strong></button><!-- Start: new line -->
                                 <div class="input-group-text w-100" style="margin: 0px;padding: 0px;height: 0px;"></div><!-- End: new line -->
                                 <!-- Start: range setting -->
                                 <div class="d-xxl-flex justify-content-xxl-center align-items-xxl-center input-group-text w-100" style="border-radius: 0px 0px 10px 0px;height: 43.3333px;" v-if="conditions.dispSwitch == 1"><input type="number" style="margin: 0px 5px;text-align: center;width: 38%;" v-model.number="conditions.rangeStart" v-on:change="updateFreq"><span style="margin: 0px 5px;">≤</span><span style="margin: 0px 5px;">{{ freqArr[conditions.parameter-2] }}</span><span style="margin: 0px 5px;">≤</span><input type="number" style="margin: 0px 5px;text-align: center;width: 38%;" v-model.number="conditions.rangeEnd" v-on:change="updateFreq"></div><!-- End: range setting -->
@@ -204,17 +210,18 @@
                                     <div style="height: 100%;width: 25%;"></div><!-- End: placeholder -->
                                 </div><!-- End: range setting -->
                                 <!-- Start: range setting -->
-                                <div class="d-xxl-flex justify-content-xxl-center align-items-xxl-center input-group-text w-100" style="border-radius: 0px 0px 10px 0px;height: 43.3333px;" v-if="conditions.dispSwitch == 3"><v-select 
-    v-model="conditions.selectedSparam" 
-    v-on:input="updateFreq"
-    :options="sparamsOptions"
-    :reduce="sparam => sparam.id"
-    placeholder="请选择S参数" 
-    label="name"
-    style="
-        display: block;
-        width: 100%"
-></v-select></div><!-- End: range setting -->
+                                <div class="d-xxl-flex justify-content-xxl-center align-items-xxl-center input-group-text w-100" style="border-radius: 0px 0px 10px 0px;height: 43.3333px;" v-if="conditions.dispSwitch == 3">
+                                    <v-select 
+                                        v-model="conditions.selectedSparam" 
+                                        v-on:input="updateFreq"
+                                        :options="sparamsOptions"
+                                        :reduce="sparam => sparam.id"
+                                        placeholder="请选择S参数" 
+                                        label="name"
+                                        style="
+                                            display: block;
+                                            width: 100%"
+                                    ></v-select></div><!-- End: range setting -->
                             </div>
                         </li>
                     </ul>
@@ -223,35 +230,102 @@
             </div><!-- End: freq response select -->
         </div><!-- End: main section -->
         <!-- Start: options -->
-        <div class="row" id="options">                <!-- Start: reset confirm -->
-            <div>
-                <!-- Start: interaction blocker -->
+        <div class="row" id="options"> <!-- Start: reset confirm -->
+            <div><!-- Start: interaction blocker -->
                 <div class="modal-overlay" v-if="showConfirm" v-on:click="cancelReset"></div><!-- End: interaction blocker -->
                 <!-- Start: reset confirm -->
                 <div class="reset-confirm" v-if="showConfirm">
                     <button class="btn btn-primary close-sub" type="button" v-on:click="cancelReset" style="font-size: 20px;">×</button>
                     <!-- Start: tips span -->
-                    <span class="tips-span" style="font-size: 20px;width: 100%;position: absolute;"><strong>真的要<span style="color: rgb(255, 15, 0);">重置</span>当前页面的所有内容吗？</strong></span><!-- End: tips span -->
+                    <span class="tips-span" style="font-size: 20px;width: 100%;position: absolute;"><strong>
+                        真的要<span style="color: rgb(255, 15, 0);">重置</span>当前页面的所有内容吗？
+                    </strong></span><!-- End: tips span -->
                     <div class="reset-confirm-buttons" style="text-align: right;position: absolute;padding: 10px;">
                         <button class="btn btn-primary" type="button" v-on:click="cancelReset">取消</button>
                         <button class="btn btn-secondary hover-red" type="button" style="margin: 0px 15px;" v-on:click="resetAll">确认重置</button>
                     </div>
                 </div><!-- End: reset confirm -->
             </div><!-- End: reset confirm -->
+            <div v-if="isWaiting"> <!-- Start: Interactive waiting -->
+                <!-- Start: interaction blocker -->
+                <div class="modal-overlay"></div><!-- End: interaction blocker -->
+                <!-- Start: Waiting tips -->
+                <div class="reset-confirm">
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===0">
+                        <p style="margin-top: 10%; color: #198754;"><strong>
+                            检索完成! 可立即下载结果
+                        </strong></p>
+                        <img src="assets/img/database-success-filled.svg" width="88px">
+                    </div>
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===1">
+                        <p style="margin-top: 10%;"><strong>
+                            正在查询中，请稍等...
+                        </strong></p>
+                        <div class="sk-cube-grid waiting-main">
+                            <div class="sk-cube sk-cube1"></div>
+                            <div class="sk-cube sk-cube2"></div>
+                            <div class="sk-cube sk-cube3"></div>
+                            <div class="sk-cube sk-cube4"></div>
+                            <div class="sk-cube sk-cube5"></div>
+                            <div class="sk-cube sk-cube6"></div>
+                            <div class="sk-cube sk-cube7"></div>
+                            <div class="sk-cube sk-cube8"></div>
+                            <div class="sk-cube sk-cube9"></div>
+                        </div>
+                    </div>
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===2">
+                        <p style="margin-top: 10%; color: red;"><strong>
+                            查询失败! 请重试或在issue中反馈问题<br>
+                            <a href="https://github.com/guwuDx/mcbServer/issues">这里反馈</a>
+                        </strong></p>
+                        <img src="assets/img/error.svg" width="50px">
+                        <p style="font-size: 12px;padding-top: 10px;">
+                            错误信息: {{ queryError }}
+                        </p>
+                    </div>
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===3">
+                        <p style="margin-top: 10%; color: #333;"><strong>
+                            查询结果过多(>1GB)! <br>请考虑缩小范围或加入更多条件
+                        </strong></p>
+                        <img src="assets/img/stack-overflow.svg" width="60px" style="transform: rotate(-10deg);">
+                    </div>
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===4">
+                        <p style="margin-top: 10%; color: #d7a308;"><strong>
+                            无匹配结果! 请考虑向我们贡献数据或加入我们<br>
+                            <span style="color: #333;">我要<a href="#"> 贡献</a> OR <a href="#"> 加入</a></span>
+                        </strong></p>
+                        <img src="assets/img/c404.svg" width="88px" style="transform: rotate(45deg) translateY(-20px)">
+                    </div>
+                    <div style="font-size: 20px;width: 100%;position: relative;" v-if="queryStatus===5">
+                        <p style="margin-top: 10%; color: #333;"><strong>
+                            请至少在一种形状中查找!
+                        </strong></p>
+                        <img src="assets/img/empty.svg" width="77px" style="transform: rotate(15deg) translateY(5px)">
+                    </div>
+                    <div class="reset-confirm-buttons" style="text-align: right;position: fixed;padding: 10px;">
+                        <button class="btn btn-primary" type="button" v-on:click="closeWaiting">{{  queryStatus === 1 ? '后台执行' : 'OK' }}</button>
+                        <button :disabled="queryStatus!=0" :class="['btn', queryStatus===0 ? 'btn-primary' : 'btn-secondary']" type="button" style="margin: 0px 15px;" v-on:click="sendDownload(resultFile)" v-if="queryStatus != 5">下载结果</button>
+                    </div>
+                </div>
+            </div><!-- End: Interactive waiting -->
             <div class="col">
                 <div style="width: 100%;padding: 0px 45px;margin: 15px 0px;display: block;">
                     <!-- Start: tools download page -->
-                    <div class="d-xxl-flex justify-content-xxl-end" style="width: 100%;"><a href="#">👉 下载函数以将结果导入到其他分析工具</a></div><!-- End: tools download page -->
+                    <div style="width: 100%;text-align: end;"><a href="#">👉 下载函数以将结果导入到其他分析工具</a></div><!-- End: tools download page -->
                     <!-- Start: buttons -->
                     <div style="width: 100%;">
                         <!-- Start: row1 -->
-                        <div class="d-xxl-flex justify-content-xxl-end" style="margin: 10px 0px;width: 100%;"><input type="file" id="fileInput" style="display: none;" accept=".json" v-on:change="handlePresetFile"><button class="btn btn-primary text-center" type="file" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" accept=".json" v-on:click="triggerFileInput"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-upload">
+                        <div style="margin: 10px 0px;width: 100%;text-align: end;">
+                            <input type="file" id="fileInput" style="display: none;" accept=".json" v-on:change="handlePresetFile">
+                            <button class="btn btn-primary text-center" type="file" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" accept=".json" v-on:click="triggerFileInput">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-upload">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"></path>
                                     <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"></path>
-                                </svg>&nbsp; 上载预设配置</button><button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;margin-left: 55px;width: 200px;" v-on:click="confirmReset">重置所有</button>
+                                </svg>&nbsp; 上载预设配置</button>
+                            <button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;margin-left: 55px;width: 200px;" v-on:click="confirmReset">重置所有</button>
                         </div><!-- End: row1 -->
                         <!-- Start: row2 -->
-                        <div class="d-xxl-flex justify-content-xxl-end" style="margin: 10px 0px;width: 100%;">
+                        <div style="margin: 10px 0px;width: 100%;text-align: end;">
                             <button class="btn btn-primary text-center" type="button" style="background: var(--bs-btn-disabled-color);color: rgb(13,110,253);font-weight: bold;border-width: 2px;width: 200px;" v-on:click="saveCurrent">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-download">
                                     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"></path>

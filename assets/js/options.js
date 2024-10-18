@@ -3,7 +3,12 @@ const EventBus = new Vue();
 new Vue({
     el: '#options',
     data: {
+        isWaiting: false,
+        queryStatus: 1, // 0: success, 1: waiting (default), 2: failed, 3: exceed limit, 4: empty result, 5: no condition
         showConfirm: false,
+        queryError: '????????',
+        resultFile: '',
+
         summary: {
             shapeSet: [],
             genericSet: [],
@@ -84,6 +89,14 @@ new Vue({
         },
 
         querySubmit() {
+            this.queryStatus = 1;
+            // 不允许在没设置形状的情况下提交
+            if (this.summary.shapeSet.length === 0) {
+                this.queryStatus = 5;
+                this.isWaiting = true;
+                return;
+            }
+
             // 创建深拷贝的请求对象
             const queryRequest = {
                 shapeSet: JSON.parse(JSON.stringify(this.summary.shapeSet)),
@@ -118,9 +131,71 @@ new Vue({
 
             // 发送请求
             this.sendRequest(queryRequest);
+            this.isWaiting = true;
         },
 
-        sendRequest(queryRequest) {}
+        sendRequest(queryRequest) {
+            axios.post('http://127.0.0.1:8000/query/api/', queryRequest, {timeout: 1e6})
+            .then((response) => {
+                console.log(response.data);
+                if (response.data.status === 0) {
+                    console.log(response.data.message);
+                    this.queryStatus = 0;
+                    this.resultFile = response.data.file;
+                } else if (response.data.status === 2) {
+                    console.log(response.data.message);
+                    this.queryStatus = 2;
+                } else if (response.data.status === 3) {
+                    console.log(response.data.message);
+                    this.queryStatus = 3;
+                } else if (response.data.status === 4) {
+                    console.log(response.data.message);
+                    this.queryStatus = 4;
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                this.queryStatus = 2;
+                if (error.code === 'ECONNABORTED') {
+                    this.queryError = '请求超时，请检查网络连接';
+                } else {
+                    this.queryError = error;
+                }
+            });
+        },
+
+        closeWaiting() {
+            this.isWaiting = false;
+        },
+
+        sendDownload(resultFile) {
+            let downloadRequest = {file: resultFile};
+            axios.get('http://127.0.0.1:8000/query/download/?file=' + resultFile, {timeout: 1e6, responseType: 'blob'})
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+        
+                // 从后端的 Content-Disposition 头部获取文件名，或使用默认的
+                const filename = response.headers['content-disposition']
+                    ? response.headers['content-disposition'].split('filename=')[1]
+                    : 'file.txt';  // 使用默认文件名
+                link.setAttribute('download', filename);  // 设置下载文件的名称
+        
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            })
+            .catch((error) => {
+                console.error(error);
+                this.queryStatus = 2;
+                if (error.code === 'ECONNABORTED') {
+                    this.queryError = '请求超时，请检查网络连接';
+                } else {
+                    this.queryError = error;
+                }
+            });
+        }
     },
     mounted() {
         EventBus.$on('shapeSet', (shapesID) => {
